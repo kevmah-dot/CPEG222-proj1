@@ -85,6 +85,14 @@ void EXTI15_10_IRQHandler(void) {
 
 int main(void){
     register_enable();
-    
-    
+    SYSCFG->EXTICR[3] &= ~SYSCFG_EXTICR4_EXTI13;
+    SYSCFG->EXTICR[3] |= SYSCFG_EXTICR4_EXTI13_PC;
+
+    EXTI->IMR |= (1 << butt_pin);
+    EXTI->RTSR |= (1 << butt_pin);
+
+    NVIC_EnableIRQ(EXTI15_10_IRQn);
+    SysTick_Config(SystemCoreClock / 10);
+    while(1);
+    return (0);
 }
