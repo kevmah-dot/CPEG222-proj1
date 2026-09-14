@@ -6,6 +6,7 @@
 #define butt_pin 13
 #define led_port GPIOB
 #define butt_port GPIOC
+
 bool butt_lock = false;
 bool cur_but;
 bool prev_but = false;
@@ -53,17 +54,17 @@ void register_enable(void){
 void Systick_Handler(void) {
     if (!butt_lock && but_out) {
         cur_led += 1;
-        if (cur_led == 0) {
+        if (cur_led == 1) {
             led_port->ODR |= (1<<green_pin);
             led_port->ODR &= ~(1<<blue_pin);
             led_port->ODR &= ~(1<<red_pin);
         }
-        else if (cur_led == 1) {
+        else if (cur_led == 2) {
             led_port->ODR &= ~(1<<green_pin);
             led_port->ODR |= (1<<blue_pin);
             led_port->ODR &= ~(1<<red_pin);
         }
-        else if (cur_led == 2) {
+        else if (cur_led == 0) {
             led_port->ODR &= ~(1<<green_pin);
             led_port->ODR &= ~(1<<blue_pin);
             led_port->ODR |= (1<<red_pin);
