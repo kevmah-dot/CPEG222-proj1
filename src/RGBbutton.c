@@ -91,6 +91,10 @@ int main(void){
     EXTI->IMR |= (1 << butt_pin);
     EXTI->RTSR |= (1 << butt_pin);
 
+    led_port->ODR &= ~(1<<green_pin);
+    led_port->ODR &= ~(1<<blue_pin);
+    led_port->ODR |= (1<<red_pin);
+
     NVIC_EnableIRQ(EXTI15_10_IRQn);
     SysTick_Config(SystemCoreClock / 10);
     while(1);
