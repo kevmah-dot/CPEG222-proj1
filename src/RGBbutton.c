@@ -8,32 +8,13 @@
 #define butt_port GPIOC
 
 bool butt_lock = false;
-bool cur_but;
-bool prev_but = false;
 unsigned debounce_delay = 50;
-bool but_out;
 int cur_led = 0;
 uint32_t last_interrupt_time = 0;
+volatile uint32_t ms = 0;
 
 void delay(volatile uint32_t count){
     while(count--);
-}
-
-void debounce(bool btn) {
-    unsigned LastDebounce;
-    cur_but = btn;
-    if (cur_but != prev_but) {
-        LastDebounce = millis();
-    }
-    if ((millis() - LastDebounce) > debounce_delay) {
-        if ((butt_lock == true) && (cur_but == false)) {
-            butt_lock = false;
-        }
-        else {
-            butt_lock = true;
-        }
-        prev_but = cur_but;
-    }
 }
 
 void register_enable(void){
@@ -52,36 +33,41 @@ void register_enable(void){
 }
 
 void Systick_Handler(void) {
-    if (!butt_lock && but_out) {
-        cur_led += 1;
-        if (cur_led == 1) {
-            led_port->ODR |= (1<<green_pin);
-            led_port->ODR &= ~(1<<blue_pin);
-            led_port->ODR &= ~(1<<red_pin);
-        }
-        else if (cur_led == 2) {
-            led_port->ODR &= ~(1<<green_pin);
-            led_port->ODR |= (1<<blue_pin);
-            led_port->ODR &= ~(1<<red_pin);
-        }
-        else if (cur_led == 0) {
-            led_port->ODR &= ~(1<<green_pin);
-            led_port->ODR &= ~(1<<blue_pin);
-            led_port->ODR |= (1<<red_pin);
-        }
-    }
+    ms++;
 }
 
 void EXTI15_10_IRQHandler(void) {
-    if (EXTI->PR & (1<<butt_pin)) {
-        uint32_t current_time = SysTick->VAL;
-        if (current_time - last_interrupt_time > 50) {
-            but_out = !but_out;
-            last_interrupt_time = current_time;
+    bool raw_butt = (GPIOC->IDR & (1<<butt_pin)) != 0;
+    if (raw_butt) {
+        if (ms - last_interrupt_time > debounce_delay) {
+            last_interrupt_time = ms;
+            if (!butt_lock) {
+                butt_lock = true;
+                cur_led = (cur_led+1)%3;
+                if (cur_led == 1) {
+                    led_port->ODR |= (1<<green_pin);
+                    led_port->ODR &= ~(1<<blue_pin);
+                    led_port->ODR &= ~(1<<red_pin);
+                }
+                else if (cur_led == 2) {
+                    led_port->ODR &= ~(1<<green_pin);
+                    led_port->ODR |= (1<<blue_pin);
+                    led_port->ODR &= ~(1<<red_pin);
+                }
+                else if (cur_led == 0) {
+                    led_port->ODR &= ~(1<<green_pin);
+                    led_port->ODR &= ~(1<<blue_pin);
+                    led_port->ODR |= (1<<red_pin);
+                }
+            }
         }
-        EXTI->PR |= (1<<butt_pin);
-    } 
+    }
+    if (!raw_butt){
+        butt_lock = false;
+    }
+    EXTI->PR |= (1<<butt_pin);
 }
+
 
 int main(void){
     register_enable();
@@ -90,13 +76,14 @@ int main(void){
 
     EXTI->IMR |= (1 << butt_pin);
     EXTI->RTSR |= (1 << butt_pin);
+    EXTI->FTSR |= (1<<butt_pin);
 
     led_port->ODR &= ~(1<<green_pin);
     led_port->ODR &= ~(1<<blue_pin);
     led_port->ODR |= (1<<red_pin);
 
     NVIC_EnableIRQ(EXTI15_10_IRQn);
-    SysTick_Config(SystemCoreClock / 10);
+    SysTick_Config(SystemCoreClock/1000);
     while(1);
     return (0);
 }
