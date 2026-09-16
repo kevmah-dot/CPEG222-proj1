@@ -34,7 +34,7 @@ void register_enable(void){
 void SysTick_Handler(void) {
     ms++;
 }
-/*
+
 void EXTI15_10_IRQHandler(void) {
     bool raw_butt = (GPIOC->IDR & (1<<butt_pin)) != 0;
     if (raw_butt) {
@@ -66,7 +66,7 @@ void EXTI15_10_IRQHandler(void) {
     }
     EXTI->PR |= (1<<butt_pin);
 }
-*/
+
 
 int main(void){
     register_enable();
@@ -84,6 +84,7 @@ int main(void){
     NVIC_EnableIRQ(EXTI15_10_IRQn);
     SysTick_Config(SystemCoreClock/1000);
     while(1) {
+        /*
         bool raw_butt = (GPIOC->IDR & (1<<butt_pin)) != 0;
         if (raw_butt) {
             if (ms- last_interrupt_time > debounce_delay) {
@@ -112,6 +113,7 @@ int main(void){
         if (!raw_butt) {
             butt_lock = false;
         }
+            */
     }
     return(0);
 }
