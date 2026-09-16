@@ -26,6 +26,9 @@ void register_enable(void){
 
     led_port->MODER &= ~(0x3 << (red_pin * 2));
     led_port->MODER |= (0x1 << (red_pin * 2));//set red
+
+    butt_port->PUPDR &= ~(0x3 << butt_pin);
+    butt_port->PUPDR |= (0x1 << butt_pin);//button pull up
 }
 
 void SysTick_Handler(void) {
