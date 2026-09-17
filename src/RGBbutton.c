@@ -8,7 +8,7 @@
 #define butt_port GPIOC
 
 bool butt_lock = false;
-unsigned debounce_delay = 50;
+unsigned debounce_delay = 250;
 int cur_led = 0;
 uint32_t last_interrupt_time = 0;
 volatile uint32_t ms = 0;
@@ -82,7 +82,7 @@ int main(void) {
     led_port->ODR |= (1<<red_pin);
     //led_port = General Purpose Input/Output B (GPIOB)
     //pointing to (->) Output Data Degister
-    //operation you want to perform, |= set 1, &=~ set 0, & read, ^= toggle, !=0 make bool
+    //operation you want to perform, |= set 1, &=~ set 0, & read, ^= toggle, !=0 make jbool
     //mask consisting of 0s except for a 1 in place of the pin youre accessing (1 << green_pin)
 
     NVIC_EnableIRQ(EXTI15_10_IRQn);
