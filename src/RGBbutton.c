@@ -68,7 +68,7 @@ void EXTI15_10_IRQHandler(void) {
 }
 
 
-int main(void){
+int main(void) {
     register_enable();
     SYSCFG->EXTICR[3] &= ~SYSCFG_EXTICR4_EXTI13;
     SYSCFG->EXTICR[3] |= SYSCFG_EXTICR4_EXTI13_PC;
@@ -80,10 +80,14 @@ int main(void){
     led_port->ODR &= ~(1<<green_pin);
     led_port->ODR &= ~(1<<blue_pin);
     led_port->ODR |= (1<<red_pin);
+    //led_port = General Purpose Input/Output B (GPIOB)
+    //pointing to (->) Output Data Degister
+    //operation you want to perform, |= set 1, &=~ set 0, & read, ^= toggle, !=0 make bool
+    //mask consisting of 0s except for a 1 in place of the pin youre accessing (1 << green_pin)
 
     NVIC_EnableIRQ(EXTI15_10_IRQn);
     SysTick_Config(SystemCoreClock/1000);
-    while(1) {
+    while(1) {};
         /*
         bool raw_butt = (GPIOC->IDR & (1<<butt_pin)) != 0;
         if (raw_butt) {
@@ -114,6 +118,5 @@ int main(void){
             butt_lock = false;
         }
             */
-    }
     return(0);
 }
