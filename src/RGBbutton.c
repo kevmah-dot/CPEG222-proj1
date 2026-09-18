@@ -82,7 +82,7 @@ int main(void) {
     led_port->ODR |= (1<<red_pin);
     //led_port = General Purpose Input/Output B (GPIOB)
     //pointing to (->) Output Data Degister
-    //operation you want to perform, |= set 1, &=~ set 0, & read, ^= toggle, !=0 make jbool
+    //operation you want to perform, |= set 1, &=~ set 0, & read, ^= toggle, !=0 make bool
     //mask consisting of 0s except for a 1 in place of the pin youre accessing (1 << green_pin)
 
     NVIC_EnableIRQ(EXTI15_10_IRQn);
